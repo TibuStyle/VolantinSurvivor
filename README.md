@@ -9,7 +9,7 @@
 3. **WASD / flechas** mueven al huaso; el **ratón** guía el **volantín** — va donde va el mouse, dentro del círculo del hilo.
 4. **Click = más hilo** · **click derecho / rueda = menos hilo**. **El volantín hace daño** por contacto a los enemigos.
 5. Recolecta **⭐ estrellas (XP)** para subir de nivel y elegir mejoras; el resto de armas atacan solas.
-6. ⚠️ **El hilo tiene física real**: si te cruza el cuerpo, **te corta y pierdes vida**. Sobrevive a los 3 Jefes de Mundo.
+6. ⚠️ **El hilo es vulnerable**: si un **enemigo toca el hilo**, **te quita vida a ti**. ¡Despeja la línea! Sobrevive a los 3 Jefes de Mundo.
 7. Gasta **🪙 Lucumí** en la **Tienda del Huaso** entre mundos (mejoras permanentes).
 
 ## 🎮 Contenido

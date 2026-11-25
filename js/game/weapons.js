@@ -5,7 +5,7 @@ const WEAPON_DEFS = {
   hilo: {
     id: "hilo", name: "Volantín Cortante", icon: "hilo", sprite: "player",
     kind: "kite",
-    desc: "El volantín hace daño a los enemigos que toca. ¡El hilo tiene física: si te cruza, te corta a ti!",
+    desc: "El volantín hace daño a los enemigos que toca. ¡Ojo: si un enemigo toca el hilo, te quita vida a ti!",
     maxLevel: 8,
     levels: [
       { damage: 13, radius: 16, tick: 0.40, kb: 50 },
