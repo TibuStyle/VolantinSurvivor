@@ -6,10 +6,10 @@
 
 1. Abre `index.html` (o sirve la carpeta con cualquier servidor estático).
 2. Pulsa **¡JUGAR!**
-3. **WASD / flechas** mueven al huaso; el **ratón** guía su **volantín** alrededor.
-4. **Click izquierdo = más hilo** · **click derecho / rueda = menos hilo** — ¡el hilo corta a los enemigos!
+3. **WASD / flechas** mueven al huaso; el **ratón** guía el **volantín** — va donde va el mouse, dentro del círculo del hilo.
+4. **Click = más hilo** · **click derecho / rueda = menos hilo**. **El volantín hace daño** por contacto a los enemigos.
 5. Recolecta **⭐ estrellas (XP)** para subir de nivel y elegir mejoras; el resto de armas atacan solas.
-6. Sobrevive hasta que aparezca el **Jefe de Mundo** y déjalo sin vida.
+6. ⚠️ **El hilo tiene física real**: si te cruza el cuerpo, **te corta y pierdes vida**. Sobrevive a los 3 Jefes de Mundo.
 7. Gasta **🪙 Lucumí** en la **Tienda del Huaso** entre mundos (mejoras permanentes).
 
 ## 🎮 Contenido
@@ -17,7 +17,7 @@
 | Elemento | Detalle |
 |---|---|
 | **3 Mundos (Jefes de Mundo)** | Plaza de la Fiesta → *Castillo Ardiente* · Orillas del Mapocho → *Lagarto del Mapocho* · Cumbre del Volantín → *El Volantín Oscuro* |
-| **9 Armas** | Hilo Cortante, Volantines, Fuego Artificial, Estrella Fugaz, Papel Picado, Choripán Explosivo, Cueca Salvaje, Mote con Huesillo, Bandera Chilena |
+| **9 Armas** | Volantín Cortante (daño de contacto del volantín), Volantines, Fuego Artificial, Estrella Fugaz, Papel Picado, Choripán Explosivo, Cueca Salvaje, Mote con Huesillo, Bandera Chilena |
 | **9 Enemigos** | Empanada Rebelde, Sopaipilla Feroz, Choripán Salvaje, Luchador del 18, Piquero Alegre, Guanaco Maldiciente, Diablito de Carnaval, Cochayuyo Colosal, Volantín Sombrio |
 | **Mini jefe** | Monito de la Carreta (aparece a mitad de cada etapa) |
 | **10 Pasivas** | Velocidad, daño, vida, XP, lucumí, recarga, alcance, crítico, armadura, regeneración |
