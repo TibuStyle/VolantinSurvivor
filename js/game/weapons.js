@@ -4,18 +4,18 @@
 const WEAPON_DEFS = {
   hilo: {
     id: "hilo", name: "Hilo Cortante", icon: "hilo", sprite: "hiloSeg",
-    kind: "orbit",
-    desc: "Arcos de hilo giran a tu alrededor y cortan todo lo que tocan.",
+    kind: "string",
+    desc: "El hilo entre tú y tu volantín corta a los enemigos. ¡Click = más hilo, botón derecho = menos!",
     maxLevel: 8,
     levels: [
-      { damage: 7,  radius: 58,  arcs: 1, rotSpeed: 3.2, tick: 0.35 },
-      { damage: 9,  radius: 62,  arcs: 2, rotSpeed: 3.4, tick: 0.33 },
-      { damage: 12, radius: 66,  arcs: 2, rotSpeed: 3.7, tick: 0.31 },
-      { damage: 15, radius: 72,  arcs: 3, rotSpeed: 3.9, tick: 0.29 },
-      { damage: 19, radius: 78,  arcs: 3, rotSpeed: 4.2, tick: 0.27 },
-      { damage: 24, radius: 84,  arcs: 4, rotSpeed: 4.5, tick: 0.25 },
-      { damage: 30, radius: 92,  arcs: 4, rotSpeed: 4.8, tick: 0.23 },
-      { damage: 38, radius: 100, arcs: 5, rotSpeed: 5.2, tick: 0.20 }
+      { damage: 8,  width: 6,  tick: 0.34 },
+      { damage: 10, width: 7,  tick: 0.32 },
+      { damage: 13, width: 8,  tick: 0.30 },
+      { damage: 16, width: 9,  tick: 0.28 },
+      { damage: 20, width: 10, tick: 0.26 },
+      { damage: 25, width: 12, tick: 0.24 },
+      { damage: 31, width: 14, tick: 0.22 },
+      { damage: 40, width: 16, tick: 0.19 }
     ]
   },
   volantin: {
@@ -186,27 +186,30 @@ const WeaponSystem = {
       const def = WEAPON_DEFS[w.id];
       const st = def.levels[w.level - 1];
 
-      if (def.kind === "orbit") {
-        w.state.angle += st.rotSpeed * dt;
-        // daño por tick a enemigos en el radio del anillo
-        w.state.hitCd._t = (w.state.hitCd._t || 0) - dt;
-        if (w.state.hitCd._t <= 0) {
-          w.state.hitCd._t = st.tick;
+      if (def.kind === "string") {
+        // el hilo huaso ↔ volantín corta enemigos (siempre activo)
+        w.state.tick = (w.state.tick || 0) - dt;
+        if (w.state.tick <= 0) {
+          w.state.tick = st.tick;
+          const k = p.kite;
+          const strW = st.width * p.stats.areaMult;
           for (const e of game.enemies) {
             if (e.dead) continue;
-            const d = U.dist(p.x, p.y, e.x, e.y);
-            if (Math.abs(d - st.radius) < 16 + e.radius * 0.6) {
+            // corte a lo largo del segmento
+            if (U.distToSegment(e.x, e.y, p.x, p.y, k.x, k.y) < strW + e.radius) {
               game.damageEnemy(e, Math.round(st.damage * mult), w.id, false);
             }
+            // el volantín también golpea al rozar
+            else if (U.circleHit(k.x, k.y, 13, e.x, e.y, e.radius)) {
+              game.damageEnemy(e, Math.round(st.damage * 0.65 * mult), w.id, false);
+            }
           }
-          // efecto visual tenue
-          if (Math.random() < 0.5) {
-            const a = U.rand(Math.PI * 2);
+          if (Math.random() < 0.6) {
+            const t = Math.random();
             Particles.spawn({
-              x: p.x + Math.cos(a) * st.radius,
-              y: p.y + Math.sin(a) * st.radius,
-              vx: Math.cos(a) * 20, vy: Math.sin(a) * 20,
-              life: 0.25, size: 2, color: "#e5dbff", glow: true
+              x: U.lerp(p.x, k.x, t), y: U.lerp(p.y, k.y, t),
+              vx: U.rand(-25, 25), vy: U.rand(-25, 25),
+              life: 0.22, size: 2, color: "#e5dbff", glow: true
             });
           }
         }
@@ -286,7 +289,7 @@ const WeaponSystem = {
         w.timer -= dt;
         if (w.timer <= 0) {
           w.timer = st.cooldown / p.stats.cooldownMult;
-          const base = p.moveAngle || U.rand(Math.PI * 2);
+          const base = (p.aimAngle !== undefined ? p.aimAngle : p.moveAngle) || U.rand(Math.PI * 2);
           for (let i = 0; i < st.count; i++) {
             const a = base + (i / st.count) * Math.PI * 2 + U.rand(-0.08, 0.08);
             game.projectiles.push({
@@ -346,7 +349,7 @@ const WeaponSystem = {
         w.timer -= dt;
         if (w.timer <= 0) {
           w.timer = st.cooldown / p.stats.cooldownMult;
-          const a = p.moveAngle || p.aimAngle || 0;
+          const a = p.aimAngle !== undefined ? p.aimAngle : (p.moveAngle || 0);
           game.waves.push({
             x: p.x, y: p.y, angle: a,
             range: st.range, arc: st.arc,
@@ -366,25 +369,8 @@ const WeaponSystem = {
     for (const w of this.list) {
       const def = WEAPON_DEFS[w.id];
       const st = def.levels[w.level - 1];
-      if (def.kind === "orbit") {
-        const cx = p.x - camX, cy = p.y - camY;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.strokeStyle = "rgba(229, 219, 255, .85)";
-        ctx.shadowColor = "#e5dbff"; ctx.shadowBlur = 8;
-        ctx.lineWidth = 3;
-        for (let i = 0; i < st.arcs; i++) {
-          const a0 = w.state.angle + (i / st.arcs) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.arc(0, 0, st.radius, a0, a0 + 1.15);
-          ctx.stroke();
-          // puntas del hilo (agujas)
-          const hx = Math.cos(a0) * st.radius, hy = Math.sin(a0) * st.radius;
-          ctx.fillStyle = "#fff";
-          ctx.fillRect(hx - 2, hy - 2, 4, 4);
-        }
-        ctx.restore();
-        ctx.shadowBlur = 0;
+      if (def.kind === "string") {
+        // el hilo principal se dibuja en Player.draw()
       } else if (def.kind === "orbiters" && w.state.positions) {
         for (const o of w.state.positions) {
           const sx = Math.round(o.x - camX), sy = Math.round(o.y - camY);

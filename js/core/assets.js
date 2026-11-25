@@ -73,6 +73,42 @@ const Assets = {
       x.fillStyle = G; x.fillRect(14, 0, 3, 2);
     });
 
+    /* ---------- HUASO (personaje que sujeta el volantín) ---------- */
+    S.huaso = this.make(30, 36, (x) => {
+      // chupalla (sombrero de huaso)
+      x.fillStyle = K; x.fillRect(3, 5, 24, 4);          // ala
+      x.fillStyle = "#57453b"; x.fillRect(4, 6, 22, 2);
+      x.fillStyle = K; x.fillRect(9, 0, 12, 6);           // copa
+      x.fillStyle = "#7a5230"; x.fillRect(10, 1, 10, 4);
+      x.fillStyle = "#c92a2a"; x.fillRect(10, 3, 10, 1);  // cinta roja
+      // cara
+      x.fillStyle = "#e8b88a"; x.fillRect(10, 9, 10, 8);
+      x.fillStyle = K; x.fillRect(12, 11, 2, 2); x.fillRect(17, 11, 2, 2);
+      x.fillRect(13, 15, 5, 1);                            // sonrisa
+      x.fillStyle = "#d4926b"; x.fillRect(11, 14, 2, 1);   // mejilla
+      // poncho (bandera chilena)
+      x.fillStyle = K; x.fillRect(5, 17, 20, 11);
+      x.fillStyle = "#1971c2"; x.fillRect(6, 18, 18, 10);
+      x.fillStyle = "#f8f9fa"; x.fillRect(6, 21, 18, 3);
+      x.fillStyle = "#e03131"; x.fillRect(6, 25, 18, 3);
+      // estrella en el pecho
+      x.fillStyle = "#fff";
+      x.fillRect(14, 19, 2, 6); x.fillRect(12, 21, 6, 2);
+      x.fillRect(13, 20, 4, 1); x.fillRect(13, 24, 3, 1);
+      // brazo con carretel de hilo (lado del volantín)
+      x.fillStyle = "#e8b88a"; x.fillRect(24, 19, 4, 4);
+      x.fillStyle = K; x.fillRect(25, 23, 5, 8);
+      x.fillStyle = "#e5dbff"; x.fillRect(26, 24, 3, 6);
+      x.fillStyle = "#f03e3e"; x.fillRect(26, 25, 3, 1); x.fillRect(26, 28, 3, 1);
+      // brazo izquierdo
+      x.fillStyle = "#e8b88a"; x.fillRect(2, 19, 4, 4);
+      // piernas
+      x.fillStyle = K; x.fillRect(9, 28, 5, 8); x.fillRect(16, 28, 5, 8);
+      x.fillStyle = "#57453b"; x.fillRect(10, 28, 3, 6); x.fillRect(17, 28, 3, 6);
+      // botas
+      x.fillStyle = "#3b2314"; x.fillRect(9, 33, 5, 3); x.fillRect(16, 33, 5, 3);
+    });
+
     /* ---------- ENEMIGOS ---------- */
     S.empanada = this.make(22, 18, (x) => {
       // masa dorada media luna

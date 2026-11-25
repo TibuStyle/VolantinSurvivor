@@ -39,7 +39,7 @@ const Game = {
 
   /* ---------- Setup ---------- */
   init() {
-    Input.init();
+    Input.init(canvas);
     Assets.init();
     AudioSys.init();
     this.resize();
@@ -887,6 +887,28 @@ const Game = {
 
     // partículas y textos
     Particles.draw(ctx, camX, camY);
+
+    // retícula del ratón (hacia donde vuela el volantín)
+    if (this.state === "play" && this.player) {
+      const mx = Math.round(Input.mouse.x), my = Math.round(Input.mouse.y);
+      ctx.strokeStyle = "rgba(255,243,191,.75)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(mx, my, 7, 0, 7);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(mx - 11, my); ctx.lineTo(mx - 4, my);
+      ctx.moveTo(mx + 4, my); ctx.lineTo(mx + 11, my);
+      ctx.moveTo(mx, my - 11); ctx.lineTo(mx, my - 4);
+      ctx.moveTo(mx, my + 4); ctx.lineTo(mx, my + 11);
+      ctx.stroke();
+      // anillo de longitud del hilo
+      const k = this.player.kite;
+      ctx.strokeStyle = "rgba(229,219,255,.18)";
+      ctx.beginPath();
+      ctx.arc(this.player.x - camX, this.player.y - camY, k.len, 0, 7);
+      ctx.stroke();
+    }
 
     // toast
     if (this.toastMsg) {
