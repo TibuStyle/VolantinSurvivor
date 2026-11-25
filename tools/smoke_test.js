@@ -38,10 +38,13 @@ class FakeCanvas {
   constructor() {
     this.width = 300; this.height = 150;
     this._ctx = makeCtx(this);
+    this.style = {};
   }
   getContext() { return this._ctx; }
   toDataURL() { return "data:image/png;base64,xxx"; }
-  style = {};
+  addEventListener() {}
+  removeEventListener() {}
+  getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
 }
 
 const elements = {};
@@ -51,6 +54,7 @@ function el(id) {
       const c = new FakeCanvas();
       c.clientWidth = 960;
       c.clientHeight = 540;
+      c.getBoundingClientRect = () => ({ left: 0, top: 0, width: 960, height: 540 });
       elements[id] = c;
       return c;
     }

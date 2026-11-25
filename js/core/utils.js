@@ -27,6 +27,14 @@ const U = {
     const r = ar + br;
     return U.dist2(ax, ay, bx, by) <= r * r;
   },
+  /* distancia de un punto al segmento A-B */
+  distToSegment(px, py, ax, ay, bx, by) {
+    const abx = bx - ax, aby = by - ay;
+    const len2 = abx * abx + aby * aby || 1;
+    let t = ((px - ax) * abx + (py - ay) * aby) / len2;
+    t = t < 0 ? 0 : (t > 1 ? 1 : t);
+    return U.dist(px, py, ax + abx * t, ay + aby * t);
+  },
   // guardado local
   save(key, data) {
     try { localStorage.setItem("volantin_" + key, JSON.stringify(data)); } catch (e) { /* noop */ }

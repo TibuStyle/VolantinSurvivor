@@ -6,10 +6,11 @@
 
 1. Abre `index.html` (o sirve la carpeta con cualquier servidor estático).
 2. Pulsa **¡JUGAR!**
-3. Muévete con **WASD** o las **flechas** — tus armas atacan solas.
-4. Recolecta **⭐ estrellas (XP)** para subir de nivel y elegir mejoras.
-5. Sobrevive hasta que aparezca el **Jefe de Mundo** y déjalo sin vida.
-6. Gasta **🪙 Lucumí** en la **Tienda del Huaso** entre mundos (mejoras permanentes).
+3. **WASD / flechas** mueven al huaso; el **ratón** guía su **volantín** alrededor.
+4. **Click izquierdo = más hilo** · **click derecho / rueda = menos hilo** — ¡el hilo corta a los enemigos!
+5. Recolecta **⭐ estrellas (XP)** para subir de nivel y elegir mejoras; el resto de armas atacan solas.
+6. Sobrevive hasta que aparezca el **Jefe de Mundo** y déjalo sin vida.
+7. Gasta **🪙 Lucumí** en la **Tienda del Huaso** entre mundos (mejoras permanentes).
 
 ## 🎮 Contenido
 
