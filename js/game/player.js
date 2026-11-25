@@ -74,7 +74,7 @@ const Player = {
       p.x += ax.x * speed * dt;
       p.y += ax.y * speed * dt;
       p.moveAngle = Math.atan2(ax.y, ax.x);
-      if (ax.x !== 0) p.facing = ax.x > 0 ? 1 : -1; // la mano no sigue al ratón: el hilo puede cruzarte
+      if (ax.x !== 0) p.facing = ax.x > 0 ? 1 : -1; // la mano sigue el movimiento (no el ratón)
     }
 
     p.x = U.clamp(p.x, 30, WORLD.w - 30);
@@ -123,19 +123,47 @@ const Player = {
     // ---- FÍSICA DEL HILO (verlet con gravedad y viento) ----
     this.updateRope(dt, game);
 
-    // ---- EL HILO TE CORRE SI TE CRUZA ----
-    const handX = p.x + (p.facing >= 0 ? 11 : -11);
-    const handY = p.y - 2;
-    const pts = p.rope.pts;
-    for (let i = 1; i < pts.length; i++) {
-      const pt = pts[i];
-      // zona segura en el agarre (los primeros tramos salen de la mano)
-      if (U.dist(pt.x, pt.y, handX, handY) < 17) continue;
-      if (U.dist(pt.x, pt.y, p.x, p.y) < 11) {
-        p.cutFlash = 0.35;
-        game.hurtPlayer(10, pt.x, pt.y);
-        Particles.burst(pt.x, pt.y, 5, "#ff6b6b", { spMax: 160, life: 0.35 });
-        break;
+    // ---- SI UN ENEMIGO TOCA EL HILO, TE QUITA VIDA A TI ----
+    // (el hilo es vulnerable: transmite el roce hacia el huaso)
+    if (game.enemies.length) {
+      const pts = p.rope.pts;
+      // bbox del hilo para descartar rápido
+      let hminX = Infinity, hmaxX = -Infinity, hminY = Infinity, hmaxY = -Infinity;
+      for (let i = 0; i < pts.length; i++) {
+        const pt = pts[i];
+        if (pt.x < hminX) hminX = pt.x;
+        if (pt.x > hmaxX) hmaxX = pt.x;
+        if (pt.y < hminY) hminY = pt.y;
+        if (pt.y > hmaxY) hmaxY = pt.y;
+      }
+      const THREAD_TOUCH_R = 7; // grosor efectivo del hilo
+      for (const e of game.enemies) {
+        if (e.dead || e.hp <= 0) continue;
+        // descarte por caja
+        if (e.x + e.radius < hminX - THREAD_TOUCH_R || e.x - e.radius > hmaxX + THREAD_TOUCH_R ||
+            e.y + e.radius < hminY - THREAD_TOUCH_R || e.y - e.radius > hmaxY + THREAD_TOUCH_R) continue;
+        // ¿toca algún tramo de la cuerda?
+        let hitX = 0, hitY = 0, touched = false;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const a = pts[i], b = pts[i + 1];
+          if (U.distToSegment(e.x, e.y, a.x, a.y, b.x, b.y) < THREAD_TOUCH_R + e.radius * 0.55) {
+            touched = true;
+            hitX = U.clamp(e.x, Math.min(a.x, b.x), Math.max(a.x, b.x));
+            hitY = U.clamp(e.y, Math.min(a.y, b.y), Math.max(a.y, b.y));
+            break;
+          }
+        }
+        if (touched) {
+          // el hilo transmite el daño: pierdes vida (invuln limita la frecuencia)
+          game.hurtPlayer(Math.max(4, Math.round(e.damage * 0.55)), hitX, hitY);
+          p.cutFlash = 0.4;
+          Particles.burst(hitX, hitY, 6, ["#ff6b6b", "#e5dbff"], { spMax: 170, life: 0.35 });
+          // pequeño empuje al enemigo (no se queda pegado al hilo)
+          const ka = U.angle(hitX, hitY, e.x, e.y);
+          e.kbx += Math.cos(ka) * 130;
+          e.kby += Math.sin(ka) * 130;
+          break; // un solo toque por frame (el invuln gestiona el resto)
+        }
       }
     }
 
