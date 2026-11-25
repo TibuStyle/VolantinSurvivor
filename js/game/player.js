@@ -332,7 +332,7 @@ const Player = {
       ctx.stroke();
     }
 
-    // ---- VOLANTÍN (el que hace daño) ----
+    // ---- VOLANTÍN (el que hace daño, hitbox, mira hacia afuera) ----
     const ksx = Math.round(k.x - camX);
     const ksy = Math.round(k.y - camY);
     ctx.fillStyle = "rgba(0,0,0,.22)";
@@ -342,17 +342,29 @@ const Player = {
 
     ctx.save();
     ctx.translate(ksx, ksy);
+    // el volantín siempre mira hacia afuera del círculo (dirección del ratón / ángulo)
+    // el ángulo del volante se calcula como k.angle (dirección desde el huaso al ratón)
+    // rotamos para que la punta mire hacia afuera (k.angle + PI/2 para la rotación del sprite)
+    // y sumamos un balanceo leve (lean)
     const lean = Math.sin(k.bobT * 2.6) * 0.2;
-    ctx.rotate((k.angle + Math.PI / 2) * 0.1 + lean);
+    ctx.rotate(k.angle + Math.PI / 2 + lean);
     const kspr = Assets.get("player");
     ctx.drawImage(kspr, -kspr.width / 2, -kspr.height / 2);
     ctx.restore();
 
-    // aura de daño del volantín
+    // ---- HITBOX DEL VOLANTÍN (el que pega y absorbe daño como el hilo) ----
+    // El volantín tiene un radio de colisión (weapon radius) y absorbe daño (daño al enemigo)
+    // Se comprueba la colisión con enemigos (ya existe en weapons.js pero lo reforzamos aquí para el daño)
+    // Nota: el daño del hilo ya está en el bloque de arriba (enemy touches hilo -> player loses life)
+    // El volantín hace daño al enemigo (ya en weapons.js)
+    // Aquí solo dibujamos la aura de daño (hitbox visual)
+    const weapon = WeaponSystem.get("kite"); // "Volantín Cortante"
+    const wLv = weapon ? weapon.level : 1;
+    const wRadius = 16 + wLv * 1; // escala del radio (16->25)
     ctx.strokeStyle = "rgba(255,212,59,.4)";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(ksx, ksy, 15, 0, 7);
+    ctx.arc(ksx, ksy, wRadius, 0, 7);
     ctx.stroke();
   }
 };
