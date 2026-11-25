@@ -3,19 +3,19 @@
 
 const WEAPON_DEFS = {
   hilo: {
-    id: "hilo", name: "Hilo Cortante", icon: "hilo", sprite: "hiloSeg",
-    kind: "string",
-    desc: "El hilo entre tú y tu volantín corta a los enemigos. ¡Click = más hilo, botón derecho = menos!",
+    id: "hilo", name: "Volantín Cortante", icon: "hilo", sprite: "player",
+    kind: "kite",
+    desc: "El volantín hace daño a los enemigos que toca. ¡El hilo tiene física: si te cruza, te corta a ti!",
     maxLevel: 8,
     levels: [
-      { damage: 8,  width: 6,  tick: 0.34 },
-      { damage: 10, width: 7,  tick: 0.32 },
-      { damage: 13, width: 8,  tick: 0.30 },
-      { damage: 16, width: 9,  tick: 0.28 },
-      { damage: 20, width: 10, tick: 0.26 },
-      { damage: 25, width: 12, tick: 0.24 },
-      { damage: 31, width: 14, tick: 0.22 },
-      { damage: 40, width: 16, tick: 0.19 }
+      { damage: 13, radius: 16, tick: 0.40, kb: 50 },
+      { damage: 16, radius: 17, tick: 0.38, kb: 55 },
+      { damage: 20, radius: 18, tick: 0.36, kb: 60 },
+      { damage: 25, radius: 19, tick: 0.33, kb: 70 },
+      { damage: 31, radius: 20, tick: 0.30, kb: 80 },
+      { damage: 38, radius: 21, tick: 0.28, kb: 90 },
+      { damage: 46, radius: 23, tick: 0.25, kb: 105 },
+      { damage: 58, radius: 25, tick: 0.22, kb: 120 }
     ]
   },
   volantin: {
@@ -186,31 +186,21 @@ const WeaponSystem = {
       const def = WEAPON_DEFS[w.id];
       const st = def.levels[w.level - 1];
 
-      if (def.kind === "string") {
-        // el hilo huaso ↔ volantín corta enemigos (siempre activo)
+      if (def.kind === "kite") {
+        // EL VOLANTÍN hace daño por contacto
         w.state.tick = (w.state.tick || 0) - dt;
         if (w.state.tick <= 0) {
           w.state.tick = st.tick;
           const k = p.kite;
-          const strW = st.width * p.stats.areaMult;
+          const kr = st.radius * p.stats.areaMult;
           for (const e of game.enemies) {
             if (e.dead) continue;
-            // corte a lo largo del segmento
-            if (U.distToSegment(e.x, e.y, p.x, p.y, k.x, k.y) < strW + e.radius) {
+            if (U.circleHit(k.x, k.y, kr, e.x, e.y, e.radius)) {
               game.damageEnemy(e, Math.round(st.damage * mult), w.id, false);
+              const ka = U.angle(k.x, k.y, e.x, e.y);
+              e.kbx += Math.cos(ka) * st.kb;
+              e.kby += Math.sin(ka) * st.kb;
             }
-            // el volantín también golpea al rozar
-            else if (U.circleHit(k.x, k.y, 13, e.x, e.y, e.radius)) {
-              game.damageEnemy(e, Math.round(st.damage * 0.65 * mult), w.id, false);
-            }
-          }
-          if (Math.random() < 0.6) {
-            const t = Math.random();
-            Particles.spawn({
-              x: U.lerp(p.x, k.x, t), y: U.lerp(p.y, k.y, t),
-              vx: U.rand(-25, 25), vy: U.rand(-25, 25),
-              life: 0.22, size: 2, color: "#e5dbff", glow: true
-            });
           }
         }
       } else if (def.kind === "orbiters") {
@@ -369,8 +359,8 @@ const WeaponSystem = {
     for (const w of this.list) {
       const def = WEAPON_DEFS[w.id];
       const st = def.levels[w.level - 1];
-      if (def.kind === "string") {
-        // el hilo principal se dibuja en Player.draw()
+      if (def.kind === "kite") {
+        // el volantín y su hilo se dibujan en Player.draw()
       } else if (def.kind === "orbiters" && w.state.positions) {
         for (const o of w.state.positions) {
           const sx = Math.round(o.x - camX), sy = Math.round(o.y - camY);
